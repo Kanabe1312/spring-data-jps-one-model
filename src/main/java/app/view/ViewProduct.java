@@ -4,6 +4,8 @@ import app.products.model.Category;
 import app.products.model.Product;
 import app.products.repository.ProductRepository;
 import jakarta.persistence.Id;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -32,6 +34,7 @@ public class ViewProduct {
         productRepository.findAll().stream().forEach(System.out::println);
         populeaza();
         citeste();
+        valideaza();
     }
 
 
@@ -73,5 +76,28 @@ public class ViewProduct {
         if (inexistent.isEmpty()){
             System.out.println("produs inexistent");
         }
+    }
+
+    private void valideaza(){
+        //gresit
+        Product gresit = new Product(" ","abc",Category.COFFEE,new BigDecimal("0.00"),-1,true,LocalDate.of(2026,1,10));
+        try {
+            productRepository.saveAndFlush(gresit);
+        }catch (ConstraintViolationException e){
+            e.getConstraintViolations().stream()
+                    .map(violation -> violation.getMessage()).sorted()
+                    .forEach(System.out::println);
+
+        }
+
+        //Corect+SKU Duplicat
+        Product duplicat = new Product("Espresso Duplicat","COF-0001",Category.COFFEE,new BigDecimal("15.00"),50,true,LocalDate.of(2026,1,10));
+        try {
+            productRepository.save(duplicat);
+        }catch (DataIntegrityViolationException e){
+            System.out.println("SKU already used: COF-0001 ");
+        }
+        System.out.println("Produse: " + productRepository.count());
+
     }
 }
