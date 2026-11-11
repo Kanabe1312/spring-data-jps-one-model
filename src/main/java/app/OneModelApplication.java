@@ -22,4 +22,5 @@ public class OneModelApplication implements CommandLineRunner {
     public void run(String... args) {
         viewProduct.start();
     }
+
 }
