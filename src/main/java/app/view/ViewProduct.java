@@ -35,6 +35,7 @@ public class ViewProduct {
         populeaza();
         citeste();
         valideaza();
+        metodeDerivate();
     }
 
 
@@ -100,4 +101,23 @@ public class ViewProduct {
         System.out.println("Produse: " + productRepository.count());
 
     }
+
+    private void metodeDerivate() {
+
+        productRepository.findBySku("TEA-0001").ifPresent(product ->
+                        System.out.println(product.getName()));
+
+        System.out.println(productRepository.findBySku("XXX-0000").isPresent());
+
+
+        System.out.println(productRepository.existsBySku("COF-0002"));
+
+        productRepository.findByCategory(Category.PASTRY).forEach(product -> System.out.println(product.getName()));
+
+        System.out.println(productRepository.countByCategory(Category.COFFEE));
+    }
+
+
+
+
 }
