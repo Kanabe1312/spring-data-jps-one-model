@@ -6,6 +6,9 @@ import app.products.repository.ProductRepository;
 import jakarta.persistence.Id;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -36,7 +39,9 @@ public class ViewProduct {
         citeste();
         valideaza();
         metodeDerivate();
-        metodeDerivateSingur();
+        //metodeDerivateSingur();
+        paginare();
+
     }
 
 
@@ -144,6 +149,30 @@ public class ViewProduct {
         System.out.println("\n--- Added after 2026-05-01 ---");
         productRepository.findByAddedOnAfter(LocalDate.of(2026, 5, 1))
                 .forEach(p -> System.out.println(p.getName()));
+    }
+
+
+    private void sortare(){
+        System.out.println("\n--- Sorted after name ---");
+        productRepository.findAll(Sort.by("name")).forEach(System.out::println);
+
+        System.out.println("\n --- Sorted after Stock desc ---");
+
+    }
+
+    private void paginare(){
+        Page<Product> pagina=productRepository.findAll(PageRequest.of(2,3,Sort.by("name")));
+
+        pagina.get().forEach(System.out::println);
+        System.out.println(pagina.getTotalElements()+" "+ pagina.getTotalPages()+" pagini");
+
+
+        System.out.println("\n--- Active products ---");
+        Page<Product> active = productRepository.findByActiveTrue(PageRequest.of(0,3,Sort.by("price")));
+
+        active.getContent().forEach(System.out::println);
+
+
     }
 
 
