@@ -36,6 +36,7 @@ public class ViewProduct {
         citeste();
         valideaza();
         metodeDerivate();
+        metodeDerivateSingur();
     }
 
 
@@ -116,6 +117,35 @@ public class ViewProduct {
 
         System.out.println(productRepository.countByCategory(Category.COFFEE));
     }
+
+
+    private void metodeDerivateSingur() {
+
+        System.out.println("\n--- Name contains TEA ---");
+        productRepository.findByNameContainingIgnoreCase("TEA").forEach(p -> System.out.println(p.getName()));
+
+        System.out.println("\n--- Price between 10 and 13 ---");
+        productRepository.findByPriceBetween(new BigDecimal("10.00"), new BigDecimal("13.00"))
+                .forEach(p -> System.out.println(p.getName()));
+
+        System.out.println("\n--- Stock less than 5 ---");
+        productRepository.findByStockLessThan(5).forEach(p -> System.out.println(p.getName()));
+
+        System.out.println("\n--- Active products ---");
+        System.out.println(productRepository.findByActiveTrue().size());
+
+        System.out.println("\n--- EQUIPMENT and active ---");
+        productRepository.findByCategoryAndActive(Category.EQUIPMENT, true).forEach(p -> System.out.println(p.getName()));
+
+        System.out.println("\n--- COFFEE or TEA ---");
+        productRepository.findByCategoryIn(List.of(Category.COFFEE, Category.TEA))
+                .forEach(p -> System.out.println(p.getName()));
+
+        System.out.println("\n--- Added after 2026-05-01 ---");
+        productRepository.findByAddedOnAfter(LocalDate.of(2026, 5, 1))
+                .forEach(p -> System.out.println(p.getName()));
+    }
+
 
 
 
