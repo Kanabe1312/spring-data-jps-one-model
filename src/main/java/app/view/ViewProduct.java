@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
@@ -37,11 +38,15 @@ public class ViewProduct {
         productRepository.findAll().stream().forEach(System.out::println);
         populeaza();
         citeste();
-        valideaza();
-        metodeDerivate();
+        //valideaza();
+        //metodeDerivate();
         //metodeDerivateSingur();
-        paginare();
-
+       // paginare();
+       // paginare6B1();
+        //paginare6B2();
+      //  paginare6B3();
+       // paginare6B4();
+        paginare6B5();
     }
 
 
@@ -181,6 +186,82 @@ public class ViewProduct {
         Page<Product> active = productRepository.findByActiveTrue(PageRequest.of(0, 3, Sort.by("price")));
 
         active.getContent().forEach(System.out::println);
+
+
+    }
+
+
+    private void paginare6B1(){
+        System.out.println("\n --- Last Page By Name ---");
+        Page<Product> prima = productRepository.findAll(PageRequest.of(0,4,Sort.by("name")));
+        int ultimapagina = prima.getTotalPages() -1;
+
+        Page<Product> pagina = productRepository.findAll(PageRequest.of(ultimapagina,4,Sort.by("name")));
+
+        pagina.getContent().forEach(product -> System.out.println(product.getName()));
+
+        System.out.println("Pagina: " + pagina.getNumber());
+        System.out.println("Elemente: "+ pagina.getTotalElements());
+        System.out.println("Prima: " + pagina.isFirst());
+        System.out.println("Ultima: " + pagina.isLast());
+        System.out.println("Urmatoarea: " + pagina.hasNext());
+    }
+
+    private void paginare6B2(){
+        System.out.println("\n--- Page 5 by name ---");
+        Page<Product> pagina5 = productRepository.findAll(PageRequest.of(4,4,Sort.by("name")));
+        pagina5.getContent().forEach(product -> System.out.println(product.getName()));
+
+        System.out.println("Are continut: " + pagina5.hasContent());
+        System.out.println("Total produse: " + pagina5.getTotalElements());
+        System.out.println("Total pagini: " + pagina5.getTotalPages());
+    }
+
+    private void paginare6B3(){
+        System.out.println("\n--- Coffe: page 1 ---");
+        Page<Product> cafea1 = productRepository.findByCategory(Category.COFFEE , PageRequest.of(0,2));
+        cafea1.getContent().forEach(product -> System.out.println(product.getName()));
+
+        System.out.println(cafea1.getTotalElements() + "produse, "+ cafea1.getTotalPages() + "pagini");
+
+        System.out.println("\n--- Coffe: page 2 ---");
+        Page<Product> cafea2 = productRepository.findByCategory(Category.COFFEE , cafea1.nextPageable());
+
+        cafea2.getContent().forEach(product -> System.out.println(product.getName()));
+        System.out.println(cafea2.getTotalElements() + "produse, "+ cafea1.getTotalPages() + "pagini");
+    }
+
+    private void paginare6B4(){
+        System.out.println("\n--- All active products ---");
+        Page<Product> pagina = productRepository.findByActiveTrue(PageRequest.of(0,3,Sort.by("price")));
+
+        while (true){
+            System.out.println("\nPagina" + (pagina.getNumber()+1) + ": ");
+            pagina.getContent().forEach(product -> System.out.println(product.getName()));
+
+            if (!pagina.hasNext()){
+                break;
+            }
+
+            pagina = productRepository.findByActiveTrue(pagina.nextPageable());
+        }
+
+
+    }
+
+    private void paginare6B5(){
+        System.out.println("\n--- Products sorted by stock and name ---");
+
+        Page<Product> pagina = productRepository.findAll(PageRequest.of(0,5,Sort.by("stock")
+                .and(Sort.by("name"))));
+        pagina.getContent().forEach(product -> System.out.println(product.getName() + "- Stock: " + product.getStock()));
+    }
+
+    private void paginare6B6(){
+        System.out.println("\n--- Products with price > 12.00 ---");
+
+        Slice<Product> felie = productRepository.findPriceGraterThen(new BigDecimal("12.00"), PageRequest.of(0,2));
+
 
 
     }

@@ -4,6 +4,7 @@ import app.products.model.Category;
 import app.products.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -32,4 +33,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findTop3ByOrderByPriceDesc();
 
     Page<Product> findByActiveTrue(Pageable pageable);
+
+    Page<Product> findByCategory(Category category,Pageable pageable);
+
+    Slice<Product> findPriceGraterThen(BigDecimal price, Pageable pagable);
 }
