@@ -21,7 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     long countByCategory(Category category);
     //ex5
     List<Product> findByNameContainingIgnoreCase(String name);
-    Page<Product> findByPriceBetween(BigDecimal min, BigDecimal max,Pageable pageable);
+    List<Product> findByPriceBetween(BigDecimal min, BigDecimal max);
     List<Product> findByStockLessThan(int stock);
     List<Product> findByActiveTrue();
     List<Product> findByCategoryAndActive(Category category, boolean active);

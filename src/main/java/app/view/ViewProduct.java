@@ -167,8 +167,18 @@ public class ViewProduct {
         System.out.println(pagina.getTotalElements()+" "+ pagina.getTotalPages()+" pagini");
 
 
-        System.out.println("\n--- Active products ---");
-        Page<Product> active = productRepository.findByActiveTrue(PageRequest.of(0,3,Sort.by("price")));
+        System.out.println("\n--- Top 3 products by price ---");
+        productRepository.findTop3ByOrderByPriceDesc().forEach(System.out::println);
+
+        System.out.println("\n--- All products by name ---");
+        productRepository.findAll(Sort.by("name")).forEach(System.out::println);
+
+
+        pagina.getContent().forEach(System.out::println);
+        System.out.println(pagina.getTotalElements() + " produse"+ pagina.getTotalPages() + " pagini");
+
+        System.out.println("\n--- Active products: page 1 ---");
+        Page<Product> active = productRepository.findByActiveTrue(PageRequest.of(0, 3, Sort.by("price")));
 
         active.getContent().forEach(System.out::println);
 
