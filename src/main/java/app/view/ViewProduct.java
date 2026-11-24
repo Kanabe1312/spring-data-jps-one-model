@@ -38,21 +38,23 @@ public class ViewProduct {
         productRepository.findAll().stream().forEach(System.out::println);
         populeaza();
         citeste();
+        sortare();
         //valideaza();
         //metodeDerivate();
         //metodeDerivateSingur();
-       // paginare();
-       // paginare6B1();
+        //paginare();
+       //paginare6B1();
         //paginare6B2();
-       //paginare6B3();
-       //paginare6B4();
+      // paginare6B3();
+      // paginare6B4();
         // paginare6B5();
        // paginare6B6();
        // queryInStock();
         //queryStockValue();
         //querySkuPrefix();7
-        modificareSave();
-        modificareDeactivate();
+        //modificareSave();
+        //modificareDeactivate();
+        paginare6B7();
     }
 
 
@@ -168,11 +170,19 @@ public class ViewProduct {
         productRepository.findAll(Sort.by("name")).forEach(System.out::println);
 
         System.out.println("\n --- Sorted after Stock desc ---");
+        productRepository.findAll(Sort.by(Sort.Direction.DESC,"stock")).forEach(
+                product -> System.out.println(product.getName() + "-Stock: " + product.getStock())
+        );
+
+        System.out.println("\n--- Coffe sorted by price DESC ---");
+
+        productRepository.findByCategoryOrderByPriceDesc(Category.COFFEE).forEach(product -> System.out.println(product.getName()
+        + " - " + product.getPrice()));
 
     }
 
     private void paginare(){
-        Page<Product> pagina=productRepository.findAll(PageRequest.of(2,3,Sort.by("name")));
+        Page<Product> pagina=productRepository.findAll(PageRequest.of(1,4,Sort.by("name")));
 
         pagina.get().forEach(System.out::println);
         System.out.println(pagina.getTotalElements()+" "+ pagina.getTotalPages()+" pagini");
@@ -197,16 +207,13 @@ public class ViewProduct {
     }
 
     private void paginare6B1(){
-        System.out.println("\n --- Last Page By Name ---");
-        Page<Product> prima = productRepository.findAll(PageRequest.of(0,4,Sort.by("name")));
-        int ultimapagina = prima.getTotalPages() -1;
-
-        Page<Product> pagina = productRepository.findAll(PageRequest.of(ultimapagina,4,Sort.by("name")));
+        System.out.println("\n --- Page 2, size 4  ---");
+        Page<Product> pagina = productRepository.findAll(PageRequest.of(1,4,Sort.by("name")));
 
         pagina.getContent().forEach(product -> System.out.println(product.getName()));
 
         System.out.println("Pagina: " + pagina.getNumber());
-        System.out.println("Elemente: "+ pagina.getTotalElements());
+        System.out.println("Elemente: "+ pagina.getNumberOfElements());
         System.out.println("Prima: " + pagina.isFirst());
         System.out.println("Ultima: " + pagina.isLast());
         System.out.println("Urmatoarea: " + pagina.hasNext());
@@ -224,7 +231,10 @@ public class ViewProduct {
 
     private void paginare6B3(){
         System.out.println("\n--- Coffe: page 1 ---");
-        Page<Product> cafea1 = productRepository.findByCategory(Category.COFFEE , PageRequest.of(0,2));
+        Page<Product> cafea1 = productRepository.findByCategory(Category.COFFEE , PageRequest.of(
+                0,2,Sort.by(Sort.Direction.DESC,"price")));
+
+
         cafea1.getContent().forEach(product -> System.out.println(product.getName()));
 
         System.out.println(cafea1.getTotalElements() + "produse, "+ cafea1.getTotalPages() + "pagini");
@@ -233,12 +243,15 @@ public class ViewProduct {
         Page<Product> cafea2 = productRepository.findByCategory(Category.COFFEE , cafea1.nextPageable());
 
         cafea2.getContent().forEach(product -> System.out.println(product.getName()));
-        System.out.println(cafea2.getTotalElements() + "produse, "+ cafea1.getTotalPages() + "pagini");
+        System.out.println(cafea2.getTotalElements() + "produse, "+ cafea2.getTotalPages() + "pagini");
     }
 
     private void paginare6B4(){
         System.out.println("\n--- All active products ---");
         Page<Product> pagina = productRepository.findByActiveTrue(PageRequest.of(0,3,Sort.by("price")));
+
+        System.out.println("Produse: " +pagina.getTotalElements());
+        System.out.println("Total paginin: "+  pagina.getTotalPages());
 
         while (true){
             System.out.println("\nPagina" + (pagina.getNumber()+1) + ": ");
@@ -284,6 +297,19 @@ public class ViewProduct {
             System.out.println("A doua felie: ");
             urmatoareaFelie.getContent().forEach(product -> System.out.println(product.getName()));
         }
+    }
+
+    private void paginare6B7(){
+        System.out.println("\n--- Page.map() ---");
+
+        Page<Product> pagina = productRepository.findAll(PageRequest.of(0,4,Sort.by(Sort.Direction.DESC,"price")));
+
+        Page<String> texte = pagina.map(product -> product.getName() + " - " + product.getPrice());
+
+        texte.getContent().forEach(System.out::println);
+
+        System.out.println("total pagini: " + texte.getTotalPages());
+
     }
 
     //EX7
