@@ -44,9 +44,15 @@ public class ViewProduct {
        // paginare();
        // paginare6B1();
         //paginare6B2();
-      //  paginare6B3();
-       // paginare6B4();
-        paginare6B5();
+       //paginare6B3();
+       //paginare6B4();
+        // paginare6B5();
+       // paginare6B6();
+       // queryInStock();
+        //queryStockValue();
+        //querySkuPrefix();7
+        modificareSave();
+        modificareDeactivate();
     }
 
 
@@ -190,7 +196,6 @@ public class ViewProduct {
 
     }
 
-
     private void paginare6B1(){
         System.out.println("\n --- Last Page By Name ---");
         Page<Product> prima = productRepository.findAll(PageRequest.of(0,4,Sort.by("name")));
@@ -257,13 +262,79 @@ public class ViewProduct {
         pagina.getContent().forEach(product -> System.out.println(product.getName() + "- Stock: " + product.getStock()));
     }
 
-    private void paginare6B6(){
+    private void paginare6B6() {
         System.out.println("\n--- Products with price > 12.00 ---");
 
-        Slice<Product> felie = productRepository.findPriceGraterThen(new BigDecimal("12.00"), PageRequest.of(0,2));
+        Slice<Product> felie = productRepository.findByPriceGreaterThan(
+                new BigDecimal("12.00"),
+                PageRequest.of(0, 2)
+        );
 
+        System.out.println("Prima felie: ");
+        felie.getContent().forEach(product ->
+                System.out.println(product.getName())
+        );
 
+        System.out.println("Are urmatoarea felie: " + felie.hasNext());
 
+        if (felie.hasNext()) {
+            Slice<Product> urmatoareaFelie = productRepository.findByPriceGreaterThan(new BigDecimal("12.00"),
+                    felie.nextPageable());
+
+            System.out.println("A doua felie: ");
+            urmatoareaFelie.getContent().forEach(product -> System.out.println(product.getName()));
+        }
+    }
+
+    //EX7
+
+    private void queryInStock(){
+        System.out.println("\n--- In stock up to 12.00 ---");
+
+        List<Product> produse = productRepository.findInStockUpTo(new BigDecimal("12.00"));
+
+        produse.forEach(p -> System.out.println(p.getName()));
+    }
+
+    private void queryStockValue() {
+        System.out.println("\n--- Total stock value ---");
+
+        BigDecimal valoare = productRepository.stockValue();
+
+        System.out.println("Stock value: " + valoare);
+    }
+
+    private void querySkuPrefix() {
+        System.out.println("\n--- Products by SKU prefix ---");
+
+        List<Product> produse = productRepository.findBySkuPrefix("PAS");
+
+        produse.forEach(product -> System.out.println(product.getName()));
+    }
+
+    //EX8
+    private void modificareSave() {
+        System.out.println("\n--- Modify Espresso ---");
+
+        Product espresso = productRepository.findBySku("COF-0001").orElseThrow();
+        espresso.setPrice(new BigDecimal("10.00"));
+
+        productRepository.save(espresso);
+        Product espressoModificat = productRepository.findBySku("COF-0001").orElseThrow();
+
+        System.out.println(espressoModificat.getPrice());
+        System.out.println("Produse: " + productRepository.count());
+    }
+
+    private void modificareDeactivate() {
+        System.out.println("\n--- Deactivate out of stock ---");
+
+        int rezultat = productRepository.deactivateOutOfStock();
+
+        System.out.println("Dezactivate: " + rezultat);
+
+        System.out.println("Produse active:");
+        productRepository.findByActiveTrue().forEach(product ->System.out.println(product.getName()));
     }
 
 
